@@ -7,18 +7,18 @@ from ..exception import main
 
 router = APIRouter(tags=["Authentication"])
 
-@router.post("/login")
+@router.post("/login", response_model=schema.TokenResponse)
 def login(userCredentials: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(database.get_db)):
     userData = db.query(models.User).filter(models.User.email == userCredentials.username).first()
     if not userData:
         messeage = "Invalid Email/Password"
-        raise main.NotFoundException(name=messeage)
+        raise main.UnauthorizedException(name=messeage)
     
     if not utils.verify(userCredentials.password, userData.password):
         messeage = "Invalid Email/Password"
-        raise main.NotFoundException(name=messeage)
+        raise main.UnauthorizedException(name=messeage)
     
     accessToken = oauth2.createAccessToken(data= {"userId": str(userData.id)})
     return {"data": {"token": accessToken,
-                     "schema": "bearer"}}
+                     "schemaType": "bearer"}}
     

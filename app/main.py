@@ -17,6 +17,14 @@ async def unicorn_exception_handler(request: Request, exc: main.NotFoundExceptio
         content={"data": exc.name},
     )
     
+@app.exception_handler(main.UnauthorizedException)
+async def unicorn_exception_handler(request: Request, exc: main.UnauthorizedException):
+    return JSONResponse(
+        status_code=401,
+        headers={"WWW-Authenticate": "Bearer"},
+        content={"data": "Unauthorized"},
+    )
+    
 @app.exception_handler(main.InternalException)
 async def unicorn_exception_handler(request: Request, exc: main.InternalException):
     return JSONResponse(

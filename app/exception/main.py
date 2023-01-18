@@ -4,7 +4,11 @@ class NotFoundException(Exception):
 
 
 class InternalException(Exception):
-    def __init__(self, message: str, status: int, name: str):
+    def __init__(self, message: str = None,  name: str = None, status: int = 500,):
         self.name = name
         self.message = message
         self.status = status
+        
+class UnauthorizedException(Exception):
+    def __init__(self, message: str):
+        self.message = message
