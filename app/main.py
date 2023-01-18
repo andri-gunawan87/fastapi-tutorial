@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from . import models, schema, utils
 from .database import engine, get_db
-from .routers import post, user
+from .routers import post, user, auth
 from .exception import main
 models.Base.metadata.create_all(bind=engine)
 
@@ -23,7 +23,7 @@ async def unicorn_exception_handler(request: Request, exc: main.InternalExceptio
         status_code=exc.status,
         content={"data": exc.name},
     )
-
+app.include_router(auth.router)
 app.include_router(post.router)
 app.include_router(user.router)
 
