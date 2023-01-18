@@ -10,7 +10,7 @@ router = APIRouter(
 )
 
 
-@router.get("/posts", response_model=schema.ResponseDataAll)
+@router.get("/", response_model=schema.ResponseDataAll)
 async def getAllPost(
     response: Response, 
     db: Session = Depends(get_db)
@@ -36,7 +36,7 @@ def createPost(
         errorData = f"Cant create post! {ex}"
         raise main.UnicornException(name = errorData)
 
-@router.get("/post/{id}", response_model=schema.ResponseData)
+@router.get("/detail/{id}", response_model=schema.ResponseData)
 def getPost(
     id, 
     response: Response, 

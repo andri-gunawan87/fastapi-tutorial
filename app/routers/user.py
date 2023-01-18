@@ -29,7 +29,7 @@ def create_user(
         statusCode = 422
         raise main.InternalException(name=str(ex), status=statusCode)
 
-@router.get('/{id}', response_model=schema.CreateUserResponse)
+@router.get('/detail/{id}', response_model=schema.CreateUserResponse)
 def getUser(
     id,
     response: Response,
