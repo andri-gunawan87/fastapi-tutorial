@@ -6,7 +6,8 @@ from ..database import get_db
 from ..exception import main
 
 router = APIRouter(
-    prefix="/posts"
+    prefix="/posts",
+    tags=["Posts"]
 )
 
 

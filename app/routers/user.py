@@ -6,7 +6,8 @@ from ..database import get_db
 from ..exception import main
 
 router = APIRouter(
-    prefix="/users"
+    prefix="/users",
+    tags=["Users"]
 )
 
 @router.post("/register", status_code=status.HTTP_201_CREATED, response_model=schema.CreateUserResponse)
