@@ -10,14 +10,12 @@ router = APIRouter(
     tags=["Posts"]
 )
 
-
 @router.get("/", response_model=schema.ResponseDataAll)
 async def getAllPost(
     response: Response, 
     db: Session = Depends(get_db),
-    currentUserId = Depends(oauth2.getCurrentUser)
+    currentUser = Depends(oauth2.getCurrentUser)
 ):
-    print(currentUserId)
     data = db.query(models.Post).all()
     response.status_code = status.HTTP_200_OK
     return {"data": data}
@@ -25,12 +23,11 @@ async def getAllPost(
 @router.post("/create", status_code=status.HTTP_201_CREATED, response_model=schema.ResponseData)
 def createPost(
     post: schema.CreatePost,
-    currentUserId = Depends(oauth2.getCurrentUser), 
+    currentUser = Depends(oauth2.getCurrentUser), 
     db: Session = Depends(get_db)
 ):
     try:
-        newPost = models.Post(**post.dict())
-        print(newPost)
+        newPost = models.Post(user_id = currentUser.id, **post.dict())
         db.add(newPost)
         db.commit()
         db.refresh(newPost)
@@ -42,7 +39,7 @@ def createPost(
 @router.get("/detail/{id}", response_model=schema.ResponseData)
 def getPost(
     id, 
-    currentUserId = Depends(oauth2.getCurrentUser), 
+    currentUser = Depends(oauth2.getCurrentUser), 
     db: Session = Depends(get_db)
 ):
     try:
@@ -56,10 +53,10 @@ def getPost(
         errorData = f"Cant find post with id: {id}"
         raise main.InternalException(name = errorData)
 
-@router.get("/delete/{id}", response_model=schema.ResponseData)
+@router.get("/delete/{id}")
 def deletePost(
     id, 
-    currentUserId = Depends(oauth2.getCurrentUser), 
+    currentUser = Depends(oauth2.getCurrentUser), 
     db: Session = Depends(get_db)
 ):
     try:
@@ -67,6 +64,11 @@ def deletePost(
         if data.first() == None:
             errorData = f"Cant find user with id: {id}"
             raise main.NotFoundException(name = errorData)
+        
+        if data.first().user_id != currentUser.id:
+            errorData = f"Cant delete another user posts"
+            return {"data": "cant delete anther user posts"}
+        
         data.delete(synchronize_session=False)
         db.commit()
         return {"data": "Success delete data"}
@@ -82,13 +84,13 @@ def updatePost(
     post: schema.CreatePost, 
     response: Response, 
     db: Session = Depends(get_db),
-    currentUserId = Depends(oauth2.getCurrentUser)
+    currentUser = Depends(oauth2.getCurrentUser)
 ):
     try:
         baseQuery = db.query(models.Post).filter(models.Post.id == id)
         data = baseQuery.first()
         if data == None:
-            errorData = f"Cant finda post with id {id}"
+            errorData = f"Cant find post with id {id}"
             raise main.NotFoundException(name = errorData)
         baseQuery.update(post.dict(), synchronize_session=False)
         db.commit()

@@ -1,16 +1,19 @@
-from jose import JWTError, jwt
-from datetime import datetime, timedelta
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 
-from . import schema
+from sqlalchemy.orm import Session
+from jose import JWTError, jwt
+from datetime import datetime, timedelta
+
+from . import schema, database, models
 from .exception import main
+from .config import settings
 
 oauthSchema = OAuth2PasswordBearer(tokenUrl='login')
 
-SECRET_KEY = "3272357538782F413F4428472B4B6250645367566B5970337336763979244226"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SECRET_KEY = settings.secret_key
+ALGORITHM = settings.algorithm
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 
 def createAccessToken(data: dict):
     toEncode = data.copy()
@@ -30,6 +33,8 @@ def verifyAccessToken(tokenData, credentialExceptions):
         raise credentialExceptions
     return tokenDataId
     
-def getCurrentUser(tokenData: str = Depends(oauthSchema)):
+def getCurrentUser(tokenData: str = Depends(oauthSchema), db: Session = Depends(database.get_db)):
     credentialException = main.UnauthorizedException(message = "errorData")
-    return verifyAccessToken(tokenData, credentialException)
+    tokenData = verifyAccessToken(tokenData, credentialException)
+    userData = db.query(models.User).filter(models.User.id == tokenData.id).first()
+    return userData

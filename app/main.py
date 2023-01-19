@@ -1,11 +1,13 @@
-from fastapi import FastAPI, status, HTTPException, Depends, Response, Request
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from sqlalchemy.orm import Session
 
-from . import models, schema, utils
-from .database import engine, get_db
+from . import models
+from .database import engine
 from .routers import post, user, auth
 from .exception import main
+from .config import Settings
+
+
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
