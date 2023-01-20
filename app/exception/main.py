@@ -10,5 +10,5 @@ class InternalException(Exception):
         self.status = status
         
 class UnauthorizedException(Exception):
-    def __init__(self, message: str):
-        self.message = message
+    def __init__(self, message: str = None, name: str = None,):
+        self.message = message if name == None else name

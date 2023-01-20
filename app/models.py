@@ -7,7 +7,7 @@ from .database import Base
 from uuid import uuid4
 
 class Post(Base):
-    __tablename__ = "posts"
+    __tablename__ = "fastapi-posts"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4,)
     title = Column(String, nullable=False)
@@ -15,12 +15,12 @@ class Post(Base):
     published = Column(Boolean, server_default='TRUE', nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
     user_id = Column(UUID(as_uuid=True), 
-                     ForeignKey("users.id", ondelete="CASCADE"), 
+                     ForeignKey("fastapi-users.id", ondelete="CASCADE"), 
                      nullable=False)
     user = relationship("User")
     
 class User(Base):
-    __tablename__ = "users"
+    __tablename__ = "fastapi-users"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     email = Column(String, nullable=False, unique=True)
@@ -28,11 +28,11 @@ class User(Base):
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
 
 class Vote(Base):
-    __tablename__ = "votes"
+    __tablename__ = "fastapi-votes"
     
     user_id = Column(UUID(as_uuid=True), 
-                     ForeignKey("users.id", ondelete="CASCADE"), 
+                     ForeignKey("fastapi-users.id", ondelete="CASCADE"), 
                      primary_key=True)
     post_id = Column(UUID(as_uuid=True), 
-                     ForeignKey("posts.id", ondelete="CASCADE"), 
+                     ForeignKey("fastapi-posts.id", ondelete="CASCADE"), 
                      primary_key=True)

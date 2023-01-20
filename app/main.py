@@ -35,7 +35,7 @@ async def unicorn_exception_handler(request: Request, exc: main.UnauthorizedExce
     return JSONResponse(
         status_code=401,
         headers={"WWW-Authenticate": "Bearer"},
-        content={"data": "Unauthorized"},
+        content={"data": exc.message},
     )
     
 @app.exception_handler(main.InternalException)

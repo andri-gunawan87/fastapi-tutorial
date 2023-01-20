@@ -11,12 +11,12 @@ router = APIRouter(tags=["Authentication"])
 def login(userCredentials: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(database.get_db)):
     userData = db.query(models.User).filter(models.User.email == userCredentials.username).first()
     if not userData:
-        messeage = "Invalid Email/Password"
-        raise main.UnauthorizedException(name=messeage)
+        errorMesseage = "Invalid Email/Password"
+        raise main.UnauthorizedException(message=errorMesseage)
     
     if not utils.verify(userCredentials.password, userData.password):
-        messeage = "Invalid Email/Password"
-        raise main.UnauthorizedException(name=messeage)
+        errorMesseage = "Invalid Email/Password"
+        raise main.UnauthorizedException(message=errorMesseage)
     
     accessToken = oauth2.createAccessToken(data= {"userId": str(userData.id)})
     return {"data": {"token": accessToken,
