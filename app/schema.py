@@ -2,9 +2,10 @@ from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, conint
 
 class CreateUser(BaseModel):
+    id: UUID
     email: EmailStr
     created_at: datetime
     
@@ -34,7 +35,7 @@ class CreatePost(BasePost):
     pass
 
 class ResponsePost(BasePost):
-    user_id: UUID
+    id: UUID
     user: CreateUser
 
     class Config:
@@ -47,8 +48,15 @@ class ResponseData(BaseModel):
         orm_mode = True
 
 class ResponseDataAll(BaseModel):
-    data: List[ResponsePost]
+    Post: ResponsePost
+    Vote: int
 
+    class Config:
+        orm_mode = True
+
+class PostResponseJoin(BaseModel):
+    data: List[ResponseDataAll]
+    
     class Config:
         orm_mode = True
 
@@ -61,3 +69,10 @@ class TokenData(BaseModel):
     
 class TokenResponse(BaseModel):
     data: Token
+    
+class Vote(BaseModel):
+    post_id: str
+    dir: conint(le=1)
+
+class VoteResponse(BaseModel):
+    data: Vote

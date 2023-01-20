@@ -1,5 +1,6 @@
 from fastapi import status, Depends, Response, APIRouter, Request
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from .. import models, schema, oauth2
 from ..database import get_db
@@ -10,13 +11,19 @@ router = APIRouter(
     tags=["Posts"]
 )
 
-@router.get("/", response_model=schema.ResponseDataAll)
+@router.get("/", response_model=schema.PostResponseJoin)
 async def getAllPost(
     response: Response, 
     db: Session = Depends(get_db),
-    currentUser = Depends(oauth2.getCurrentUser)
+    currentUser = Depends(oauth2.getCurrentUser),
+    search: str = "",
+    limit: int = 10,
+    skip: int = 0
 ):
-    data = db.query(models.Post).all()
+    data = db.query(models.Post, func.count(models.Post.id).label("Vote")).join(
+        models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(
+            models.Post.id).filter(
+                models.Post.title.contains(search)).limit(limit).offset(skip).all()
     response.status_code = status.HTTP_200_OK
     return {"data": data}
 
