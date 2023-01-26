@@ -8,7 +8,8 @@ from ..exception import main
 router = APIRouter(tags=["Authentication"])
 
 @router.post("/login", response_model=schema.TokenResponse)
-def login(userCredentials: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(database.get_db)):
+def login(userCredentials: OAuth2PasswordRequestForm = Depends(), 
+          db: Session = Depends(database.get_db)):
     userData = db.query(models.User).filter(models.User.email == userCredentials.username).first()
     if not userData:
         errorMesseage = "Invalid Email/Password"

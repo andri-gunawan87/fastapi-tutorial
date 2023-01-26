@@ -19,9 +19,13 @@ def create_user(
     hashedPassword = utils.hash(user.password)
     user.password = hashedPassword
     
+    isExistingEmail = db.query(models.User).filter(models.User.email == user.email).first()
+    if isExistingEmail:
+        statusCode = 422
+        name = "This email already registered"
+        raise main.InternalException(name=name, status=statusCode)
     try:
         newUser = models.User(**user.dict())
-        print(newUser)
         db.add(newUser)
         db.commit()
         db.refresh(newUser)

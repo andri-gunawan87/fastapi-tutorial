@@ -34,7 +34,7 @@ def verifyAccessToken(tokenData, credentialExceptions):
     return tokenDataId
     
 def getCurrentUser(tokenData: str = Depends(oauthSchema), db: Session = Depends(database.get_db)):
-    credentialException = main.UnauthorizedException(message = "errorData")
+    credentialException = main.UnauthorizedException(message = "There is a error when verify user")
     tokenData = verifyAccessToken(tokenData, credentialException)
     userData = db.query(models.User).filter(models.User.id == tokenData.id).first()
     return userData
